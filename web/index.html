@@ -48,7 +48,9 @@
                     console.log("bad status");
                     return;
                 }
-                L.geoJSON(xhr.response).addTo(m);
+                var ky = L.geoJSON(xhr.response);
+                var overlayMaps = {'Kentucky': ky};
+                L.control.layers(null, overlayMaps, {collapsed: false}).addTo(m);
             };
             xhr.send();
         </script>
