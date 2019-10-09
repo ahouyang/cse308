@@ -59,10 +59,15 @@ function loadGeoJSON(name, url, func, show) {
 
 function color_precinct(layer, dem, rep) {
     layer.bindPopup(dem + ':' + rep);
-    if (dem > rep) {
+    if (dem == 0 && rep == 0) {
+        layer.setStyle({fillColor: '#FFFFFF', color: '#FFFFFF'});
+    }
+    else if (dem > rep) {
         layer.setStyle({fillColor: '#3388FF', color: '#3388FF'});
-    } else {
+    } else if (dem < rep) {
         layer.setStyle({fillColor: '#FF0000', color: '#FF0000'});
+    } else if (dem == rep) {
+        layer.setStyle({fillColor: '#8b008b', color: '#8b008b'});
     }
 }
 
