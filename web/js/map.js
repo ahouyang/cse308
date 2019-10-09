@@ -49,12 +49,21 @@ function addBackButton() {
     b.addTo(m);
 }
 
-function loadGeoJSON(name, url, func, add) {
+function loadGeoJSON(name, url, func, show) {
     $.getJSON(url, function (json) {
-        layers[name] = new L.GeoJSON(json, {onEachFeature: func});
-        if (add)
+        layers[name] = new L.GeoJSON(json, {onEachFeature: func, style: {'weight': 1}});
+        if (show)
             layers[name].addTo(m);
     });
+}
+
+function color_precinct(layer, dem, rep) {
+    layer.bindPopup(dem + ':' + rep);
+    if (dem > rep) {
+        layer.setStyle({fillColor: '#3388FF', color: '#3388FF'});
+    } else {
+        layer.setStyle({fillColor: '#FF0000', color: '#FF0000'});
+    }
 }
 
 function ky_func(feature, layer) {
@@ -63,6 +72,10 @@ function ky_func(feature, layer) {
             setMap(37.5, -86, 8, layers['ky_precincts']);
         }
     });
+}
+
+function ky_precinct_func(feature, layer) {
+    color_precinct(layer, layer.feature.properties.DemPer * 100, layer.feature.properties.RepPer * 100);
 }
 
 function va_func(feature, layer) {
@@ -76,9 +89,9 @@ function va_func(feature, layer) {
 function pa_func(feature, layer) {}
 
 loadGeoJSON('ky_border', 'geoJSON/ky_border.geojson', ky_func, true);
-loadGeoJSON('ky_precincts', 'geoJSON/ky_slightlysimple.geojson', function (feature, layer) {}, false);
+loadGeoJSON('ky_precincts', 'geoJSON/ky_slightlysimple.geojson', ky_precinct_func, false);
 
 loadGeoJSON('pa_border', 'geoJSON/pa_border.geojson', pa_func, true);
 
 loadGeoJSON('va_border', 'geoJSON/va_border.geojson', va_func, true);
-loadGeoJSON('va_precincts', 'geoJSON/va_precincts.geojson', function (feature, layer) {}, false);
+loadGeoJSON('va_precincts', 'geoJSON/va_precincts.geojson', function (f, l) {}, false);
