@@ -1,4 +1,6 @@
 var m = L.map('map').setView([37.5159, -82.0912], 6);
+m.zoomControl.remove();
+var zoom = L.control.zoom();
 lockMap();
 var bg = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -9,14 +11,14 @@ var layers = {};
 
 function clearMap() {
     m.eachLayer(function (layer) {
-        if (layer != bg)
+        if (layer !== bg)
             m.removeLayer(layer);
     });
 }
 
 function lockMap() {
+    zoom.remove();
     m.dragging.disable();
-    m.zoomControl.remove();
     m.touchZoom.disable();
     m.doubleClickZoom.disable();
     m.scrollWheelZoom.disable();
@@ -25,12 +27,23 @@ function lockMap() {
     // $(".leaflet-control-zoom").css("visibility", "hidden");
 }
 
+function unlockMap() {
+    zoom.addTo(m);
+    m.dragging.enable();
+    m.touchZoom.enable();
+    m.doubleClickZoom.enable();
+    m.scrollWheelZoom.enable();
+    m.boxZoom.enable();
+    m.keyboard.enable();
+}
+
 function setMap(lat, long, zoom, overlay) {
     clearMap();
     lockMap();
     m.setView([lat, long], zoom);
     overlay.addTo(m);
     addBackButton();
+    unlockMap();
 }
 
 function goHome() {
@@ -39,6 +52,7 @@ function goHome() {
     layers['ky_border'].addTo(m);
     layers['pa_border'].addTo(m);
     m.setView([37.5159, -82.0912], 6);
+    lockMap();
     this.remove();
 }
 
@@ -59,14 +73,13 @@ function loadGeoJSON(name, url, func, show) {
 
 function color_precinct(layer, dem, rep) {
     layer.bindPopup(dem + ':' + rep);
-    if (dem == 0 && rep == 0) {
+    if (dem === 0 && rep === 0) {
         layer.setStyle({fillColor: '#FFFFFF', color: '#FFFFFF'});
-    }
-    else if (dem > rep) {
+    } else if (dem > rep) {
         layer.setStyle({fillColor: '#3388FF', color: '#3388FF'});
     } else if (dem < rep) {
         layer.setStyle({fillColor: '#FF0000', color: '#FF0000'});
-    } else if (dem == rep) {
+    } else if (dem === rep) {
         layer.setStyle({fillColor: '#8b008b', color: '#8b008b'});
     }
 }
