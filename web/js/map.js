@@ -2,8 +2,13 @@ var m = L.map('map').setView([37.5159, -82.0912], 6);
 m.zoomControl.remove();
 var zoom = L.control.zoom();
 lockMap();
-var bg = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+//var bg = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+//    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+//});
+var bg = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}', {
+    attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    subdomains: 'abcd',
+    ext: 'png'
 });
 bg.addTo(m);
 
@@ -15,10 +20,19 @@ var sidebar = L.control.sidebar({
 }).addTo(m);
 sidebar.remove();
 
+var form = '<fieldset> \n\
+            <legend>Parameters</legend> \n\
+            <label>Title: </label> <input type="range" id="title"> \n\
+            <br> <br> \n\
+            <label>Tags: </label> <input type="range" id="tags"> \n\
+            <br> <br> <br> \n\
+            <input type="button" value="Submit" onclick="ask()"> \n\
+        </fieldset>';
+
 sidebar.addPanel({
     id: 'click',
     tab: '<i class="fa fa-gear"></i>',
-    pane: '<p> yo bruh whats up </p>'
+    pane: form
 });
 
 var layers = {};
@@ -141,3 +155,17 @@ loadGeoJSON('pa_precincts', 'geoJSON/pa_precincts.geojson', pa_precinct_func, fa
 
 loadGeoJSON('va_border', 'geoJSON/va_border.geojson', va_func, true);
 loadGeoJSON('va_precincts', 'geoJSON/va_precincts.geojson', function (f, l) {}, false);
+
+$( function() {
+    $( "#slider-range" ).slider({
+      range: true,
+      min: 0,
+      max: 500,
+      values: [ 75, 300 ],
+      slide: function( event, ui ) {
+        $( "#amount" ).val( "$" + ui.values[ 0 ] + " - $" + ui.values[ 1 ] );
+      }
+    });
+    $( "#amount" ).val( "$" + $( "#slider-range" ).slider( "values", 0 ) +
+      " - $" + $( "#slider-range" ).slider( "values", 1 ) );
+  } );
