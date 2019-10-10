@@ -11,12 +11,13 @@ var sidebar = L.control.sidebar({
     autopan: false,       // whether to maintain the centered map point when opening the sidebar
     closeButton: true,    // whether t add a close button to the panes
     container: 'sidebar', // the DOM container or #ID of a predefined sidebar container that should be used
-    position: 'left',     // left or right
+    position: 'left'     // left or right
 }).addTo(m);
+sidebar.remove();
 
 sidebar.addPanel({
     id: 'click',
-    tab: '<i class="fa fa-info"></i>',
+    tab: '<i class="fa fa-gear"></i>',
     pane: '<p> yo bruh whats up </p>'
 });
 
@@ -52,7 +53,6 @@ function unlockMap() {
 
 function setMap(lat, long, zoom, overlay) {
     clearMap();
-    lockMap();
     m.setView([lat, long], zoom);
     overlay.addTo(m);
     addBackButton();
@@ -67,6 +67,7 @@ function goHome() {
     m.setView([37.5159, -82.0912], 6);
     lockMap();
     this.remove();
+    sidebar.remove();
 }
 
 function addBackButton() {
@@ -101,6 +102,7 @@ function ky_func(feature, layer) {
     layer.on({
         click: function () {
             setMap(37.5, -86, 8, layers['ky_precincts']);
+            sidebar.addTo(m);
         }
     });
 }
@@ -113,16 +115,29 @@ function va_func(feature, layer) {
     layer.on({
         click: function () {
             setMap(37.8478, -80.1567, 8, layers['va_precincts']);
+            sidebar.addTo(m);
         }
     });
 }
 
-function pa_func(feature, layer) {}
+function pa_func(feature, layer) {
+    layer.on({
+        click: function() {
+            setMap(40.915, -78.437, 8, layers['pa_precincts']);
+            sidebar.addTo(m);
+        }
+    });
+}
+
+function pa_precinct_func(feature, layer) {
+    color_precinct(layer, layer.feature.properties.T16DEM, layer.feature.properties.T16REP);
+}
 
 loadGeoJSON('ky_border', 'geoJSON/ky_border.geojson', ky_func, true);
 loadGeoJSON('ky_precincts', 'geoJSON/ky_slightlysimple.geojson', ky_precinct_func, false);
 
 loadGeoJSON('pa_border', 'geoJSON/pa_border.geojson', pa_func, true);
+loadGeoJSON('pa_precincts', 'geoJSON/pa_precincts.geojson', pa_precinct_func, false);
 
 loadGeoJSON('va_border', 'geoJSON/va_border.geojson', va_func, true);
 loadGeoJSON('va_precincts', 'geoJSON/va_precincts.geojson', function (f, l) {}, false);
